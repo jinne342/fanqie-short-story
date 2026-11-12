@@ -206,7 +206,7 @@ python scripts/classics_index.py similarity \
 【结构参考】X《书名》的“物件开场 + 冷眼反讽”；不复用其句子、专名、情节链。
 ```
 
-完整方法、卡片模板、六个“快速反应”配方见 [`references/06-classics-library.md`](references/06-classics-library.md)。
+完整方法、卡片模板、六个“快速反应”配方见 [`references/06-classics-library.md`](references/06-classics-library.md)。一个“县城相亲角”的完整仿写示例见 [`examples/classics-demo.md`](examples/classics-demo.md)。
 
 > 版权边界：原文索引只放本地；仓库只放技法摘要和 100 本种子卡，不放版权文本。仿写只搬工序，不搬表达。
 
