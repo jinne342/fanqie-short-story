@@ -7,7 +7,7 @@ $target = Join-Path $Destination "fanqie-short-story"
 
 New-Item -ItemType Directory -Force $target | Out-Null
 
-$items = @("SKILL.md", "prompt.md", "README.md", "LICENSE", "references", "scripts", "examples")
+$items = @("SKILL.md", "prompt.md", "README.md", "LICENSE", "assets", "references", "scripts", "examples")
 foreach ($item in $items) {
     Copy-Item -Path (Join-Path $source $item) -Destination $target -Recurse -Force
 }

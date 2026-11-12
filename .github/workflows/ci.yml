@@ -13,8 +13,10 @@ jobs:
         with:
           python-version: "3.11"
       - name: Compile
-        run: python -m py_compile scripts/check_ai.py scripts/selftest.py
+        run: python -m py_compile scripts/check_ai.py scripts/selftest.py scripts/classics_index.py scripts/selftest_classics.py
       - name: Self-test
         run: python scripts/selftest.py
+      - name: Classics pipeline self-test
+        run: python scripts/selftest_classics.py
       - name: Human draft must pass strict gate
         run: python scripts/check_ai.py examples/case-01/human-draft.txt --strict
