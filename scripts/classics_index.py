@@ -4,7 +4,7 @@
 
 三个层次：
   seed        100 本技法种子卡（随 skill 发布，无需原文）
-  build       把本地 .txt/.md/.docx 建成本地 SQLite 全文索引（可到 1 万本）
+  build       把本地 .txt/.md/.docx 建成本地 SQLite 全文索引（约 1000 本；可扩展）
   query       从索引里取 3–5 段最相关的原文
   similarity  检查生成稿与索引/原文的最长重合片段
 
@@ -16,7 +16,7 @@
   python classics_index.py similarity --against 原文.txt --file 正文.txt
 
 设计原则：
-- 不把 1 万本全文塞进上下文；只取 top-k 段落。
+- 不把 1000 本全文塞进上下文；只取 top-k 段落。
 - 不抄句子；相似度 >= 12 字重合必须改。
 - 索引只存本地，不随 skill 发布；种子卡只含技法摘要，不含长引文。
 """
@@ -65,6 +65,18 @@ def visible_len(text: str) -> int:
 
 # ---------------- seed ----------------
 
+# 把“抽象感觉”粗映射到技法类别。不是语义模型，但比纯关键词多走一步。
+SEED_ALIASES = {
+    "潮湿": ["场景"], "雨": ["场景", "开篇"], "闷": ["场景"], "热": ["场景"],
+    "冷眼": ["视角"], "旁观": ["视角"], "疏离": ["视角"], "不可靠": ["视角"],
+    "婚姻": ["人物", "冲突", "场景"], "相亲": ["人物", "场景"], "家庭": ["人物", "冲突"],
+    "短句": ["对话", "节奏"], "克制": ["视角", "对话"], "留白": ["结尾", "视角"],
+    "反转": ["冲突", "结尾"], "悬念": ["开篇", "冲突"], "节奏": ["节奏"],
+    "开头": ["开篇"], "结尾": ["结尾"], "对话": ["对话"], "细节": ["场景"],
+    "物件": ["场景", "人物"], "孤独": ["视角", "结尾"], "时间": ["节奏"],
+}
+
+
 def load_seed(path: Path) -> list[dict]:
     if not path.exists():
         raise SystemExit(f"seed not found: {path}")
@@ -76,6 +88,12 @@ def seed_query(args: argparse.Namespace) -> int:
     terms = [t for t in re.split(r"[\s,，、;；]+", args.query.strip()) if t]
     if not terms:
         raise SystemExit("empty query")
+
+    alias_cats: set[str] = set()
+    for term in terms:
+        for key, cats in SEED_ALIASES.items():
+            if key in term or term in key:
+                alias_cats.update(cats)
 
     scored = []
     for item in items:
@@ -92,11 +110,16 @@ def seed_query(args: argparse.Namespace) -> int:
                 score += 3
             if term in blob:
                 score += 1
+        if item.get("category") in alias_cats:
+            score += 3
         if score:
             scored.append((score, item))
 
     scored.sort(key=lambda x: (-x[0], x[1]["id"]))
     picked = scored[: args.limit]
+
+    if not picked and alias_cats:
+        picked = [(0, it) for it in items if it.get("category") in alias_cats][: args.limit]
 
     if args.json:
         out(json.dumps([{"score": s, **it} for s, it in picked], ensure_ascii=False, indent=2))
