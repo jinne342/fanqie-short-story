@@ -255,6 +255,7 @@ python scripts/check_ai.py 正文.txt --sections
 - `ai-draft.txt`：**25/100 D**，2 类阻断（“不是 A 而是 B”、结尾“这一切才刚刚开始”），4 类建议。
 - `human-draft.txt`：**100/100 A**，714 字样章，无阻断项。
 - 用一篇 1.8 万字的同人番外做回归：**93/100 A**，只剩“连续短句”一条建议（有意的排比节奏；该文为本地测试稿，未收录）。
+- 名著库管线：100 条种子卡、3 本测试库的 build/query/similarity 全部通过；12 字以上重合会触发 `--strict` 退出 1。
 
 对照案例见 [`examples/case-01/notes.md`](examples/case-01/notes.md)。
 

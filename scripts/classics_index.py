@@ -355,6 +355,16 @@ def similarity(args: argparse.Namespace) -> int:
             candidates.append((f"《{r['title']}》{r['author']}", r["text"]))
         conn.close()
 
+    if not candidates:
+        if args.json:
+            out(json.dumps({
+                "max_overlap": 0, "threshold": args.threshold, "flagged": False,
+                "source": "", "overlap": "", "warning": "no candidates",
+            }, ensure_ascii=False, indent=2))
+        else:
+            out("没有检索到候选段落，无法判断相似度；换关键词，或用 --against 指定原文。")
+        return 0
+
     best_len = 0
     best_src = ""
     best_text = ""
